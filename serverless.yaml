@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Serverless Webapp
+Resources:
+  ServerlessWebapp:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: 'serverless-webapp'
+      Handler: 'serverless.webapp.LambdaEntryPoint::handleRequest'
+      CodeUri: './build/libs/serverless-webapp-all.jar'
+      Runtime: java8
+      MemorySize: 256
+      Timeout: 30
+      Role: ''
+      Events:
+        APIs:
+          Type: Api
+          Properties:
+            Path: '/{proxy+}'
+            Method: ANY

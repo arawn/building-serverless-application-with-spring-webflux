@@ -1,0 +1,57 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
+
+buildscript {
+	ext {
+		springBootVersion = '2.0.0.M3'
+		shadowVersion = '2.0.1'
+	}
+	repositories {
+		mavenCentral()
+		jcenter()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("com.github.jengelman.gradle.plugins:shadow:${shadowVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('com.amazonaws.serverless:aws-serverless-java-container-core:0.6') {
+		exclude module: 'javax.servlet-api'
+		exclude module: 'javax.ws.rs-api'
+	}
+
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('io.projectreactor:reactor-test')
+}
+
+shadowJar {
+	mergeServiceFiles()
+	append 'META-INF/spring.handlers'
+	append 'META-INF/spring.schemas'
+	append 'META-INF/spring.tooling'
+	transform(PropertiesFileTransformer) {
+		paths = ['META-INF/spring.factories' ]
+		mergeStrategy = "append"
+	}
+}
+
+wrapper {
+    gradleVersion = '4.1'
+}
